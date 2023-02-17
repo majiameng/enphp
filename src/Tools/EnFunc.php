@@ -1,5 +1,9 @@
 <?php
+namespace tinymeng\enphp\Tools;
 
+/**
+ * EnFunc
+ */
 class EnFunc
 {
     /**
@@ -20,7 +24,7 @@ class EnFunc
     /**
      * enphp content
      *
-     * @param       $file
+     * @param $content
      * @param array $options
      *
      * @return string
