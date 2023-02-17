@@ -170,9 +170,9 @@ class EnFunc
      *
      * @return string
      */
-    function strip_whitespace($content, $options = array()) {
+    public function strip_whitespace($content, $options = array()) {
 
-        format_code($content);
+        $this->formatCode($content);
         $list                 = token_get_all($content);
         $last_space           = false;
         $is_function          = false;
@@ -250,8 +250,8 @@ class EnFunc
         $is_debug             = $options['debug'];
         $php_version          = $options['php'];
 
-        $str_var_name    = substr(generate_name($options['encode_str'], $options['encode_str_length']), 1);
-        $str_define_name = substr(generate_name($options['encode_str'], $options['encode_str_length']), 1);
+        $str_var_name    = substr($this->generate_name($options['encode_str'], $options['encode_str_length']), 1);
+        $str_define_name = substr($this->generate_name($options['encode_str'], $options['encode_str_length']), 1);
         // 这里必须要多个字符防止多重混淆时，产生碰撞导致分隔符失效
         static $str_var_splits = array();
         $str_var_char = '';
@@ -292,7 +292,7 @@ class EnFunc
         $is_ob_array            = is_array($options['ob_call']);
         $allow_modify_variables = array('T_VARIABLE', 'T_INLINE_HTML', 'T_STRING', 'T_CONSTANT_ENCAPSED_STRING');
         for ($key = 0; $key < count($list); $key++) {
-            $start_time = microtime_float();
+            $start_time = $this->microtime_float();
             //list($time, $start_time) = explode('.', );
             $val = &$list[$key];
             //log::info($val);
@@ -449,7 +449,7 @@ class EnFunc
                                 // add list
                                 $str_index = array_push($str_var_str, $val[1]) - 1;
                                 //$str_var_index++
-                                $val[1]                   = $str_global_var . rand_quote(num_hex($options['encode_number'], $str_index));
+                                $val[1]                   = $str_global_var . $this->rand_quote($this->num_hex($options['encode_number'], $str_index));
                                 $str_var_list[$token_str] = $val[1];
                             } else {
                                 $val[1] = $str_var_list[$token_str];
@@ -569,7 +569,7 @@ class EnFunc
                         if ($is_class == 1 || $is_namespace == 1) {
                             break;
                         }
-                        if (find_last_token($list, $key, array('class', 'namespace', 'extends', 'implements'))) {
+                        if ($this->find_last_token($list, $key, array('class', 'namespace', 'extends', 'implements'))) {
                             break;
                         }
                         //namespace
@@ -578,10 +578,10 @@ class EnFunc
                         }
                         //log::info('find2', $is_ob, find_last_token($list, $key, array('->', '::')), $val[1]);
                         // skip object call or static call
-                        $last_is_call = find_last_token($list, $key, array('->', '::'));
+                        $last_is_call = $this->find_last_token($list, $key, array('->', '::'));
                         if ($is_ob && $last_is_call) {
                             // only method encode
-                            if (!find_next_token($list, $key, array('('))) {
+                            if (!$this->find_next_token($list, $key, array('('))) {
                                 break;
                             }/*
                         if (find_last_token($list, $key - 1, array('self'))) {
@@ -621,7 +621,7 @@ class EnFunc
                             break;
                         }
                         if ($is_ob) {
-                            $next_is_static = find_next_token($list, $key, array('.', ',', ')', ';', '+',
+                            $next_is_static = $this->find_next_token($list, $key, array('.', ',', ')', ';', '+',
                                 '-', '/', '%', '&', '|', ':',//三元操作符
                                 '>>', '!=', '!==', '==',
                                 '>=', '<=', '!==', '<>', '^', '?>', '::',
@@ -636,8 +636,8 @@ class EnFunc
                                 // add list
                                 $str_index = array_push($str_var_str, $val[1]) - 1;
                                 if (!$is_quote) {
-                                    $is_str_defined           = get_defined($val[1]);
-                                    $val[1]                   = $str_global_var . rand_quote(num_hex($options['encode_number'], $str_index));
+                                    $is_str_defined           = $this->get_defined($val[1]);
+                                    $val[1]                   = $str_global_var . $this->rand_quote($this->num_hex($options['encode_number'], $str_index));
                                     $str_var_list[$token_str] = sprintf($is_str_defined ? 'constant(%s)' : '%s', $val[1]);
                                 } else {
                                     $str_var_list[$token_str] = $val[1];
@@ -986,7 +986,7 @@ class EnFunc
                             break;
                         }
                         if ($is_if) {
-                            if (find_left_quote($list, $key)) {
+                            if ($this->find_left_quote($list, $key)) {
                                 $is_if = 0;
                             }
                             break;
@@ -1133,14 +1133,15 @@ class EnFunc
 
             $vars = 'error_reporting(E_ALL^E_NOTICE);';
             $vars .= 'define(\'' . $str_define_name . '\', \'' . $str_var_name . '\');';
-            $vars .= $options['insert_mess'] ? generate_name(2, rand(100, 200), 0, 0) . ';' : '';
-            $vars .= $str_global . '[' . $str_define_name . '] = explode(\'' . $str_var_char . '\', ' . output_gz($str_var_str, 'gzinflate', 'substr', $options['encode_number'], $options['encode_gz']) . ');';
-            $vars .= $options['insert_mess'] ? generate_name(2, rand(100, 200), 0, 0) . ';' : '';
+            $vars .= $options['insert_mess'] ? $this->generate_name(2, rand(100, 200), 0, 0) . ';' : '';
+            $vars .= $str_global . '[' . $str_define_name . '] = explode(\'' . $str_var_char . '\', ' . $this->output_gz($str_var_str, 'gzinflate', 'substr', $options['encode_number'], $options['encode_gz']) . ');';
+            $vars .= $options['insert_mess'] ? $this->generate_name(2, rand(100, 200), 0, 0) . ';' : '';
             //$vars .= '?'.'>';
         }
         $str           = '';
         $is_namespace  = false;
         $namespace_str = '';
+//        var_dump($list);die;
         foreach ($list as $key => $c) {
             if (isset($insert_list[$key])) {
                 $str .= $insert_list[$key];
@@ -1177,7 +1178,7 @@ class EnFunc
      *
      * @return string
      */
-    function enphp_cut_str($html, $start = '', $end = '') {
+    public function enphp_cut_str($html, $start = '', $end = '') {
         if ($start) {
             $html = stristr($html, $start, false);
             $html = substr($html, strlen($start));
@@ -1203,13 +1204,13 @@ class EnFunc
      *
      * @return string
      */
-    function enphp_mask_match($html, $pattern, $returnfull = false) {
+    public function enphp_mask_match($html, $pattern, $returnfull = false) {
         $part = explode('(*)', $pattern);
         if (count($part) == 1) {
             return '';
         } else {
             if ($part[0] && $part[1]) {
-                $res = enphp_cut_str($html, $part[0], $part[1]);
+                $res = $this->enphp_cut_str($html, $part[0], $part[1]);
                 if ($res) {
                     return $returnfull ? $part[0] . $res . $part[1] : $res;
                 }
@@ -1236,14 +1237,14 @@ class EnFunc
         }
     }
 
-    function format_code(&$source) {
+    public function formatCode(&$source) {
         $patterns = array(
             '#<hi' . 'de>(*)#</hi' . 'de>'       => '',
             '/*<hi' . 'de>*/(*)/*</hi' . 'de>*/' => '',
         );
         // replace hide block
         foreach ($patterns as $pattern => $replace) {
-            $search = enphp_mask_match($source, $pattern, true);
+            $search = $this->enphp_mask_match($source, $pattern, true);
             $source = str_replace($search, $replace, $source);
         }
 
@@ -1274,7 +1275,7 @@ class EnFunc
     }
 
 
-    function encode_num($s, $rand = 0) {
+    public function encode_num($s, $rand = 0) {
         $n1 = rand(1, 100);
         $n2 = rand(2, 200);
         $n3 = rand(300, 500);
@@ -1301,7 +1302,7 @@ class EnFunc
      *
      * @param $s
      */
-    function encode_str($s, $rand = 0) {
+    public function encode_str($s, $rand = 0) {
         switch (rand(1, 4 + $rand)) {
             case 1:
                 $s = base64_encode($s);
@@ -1332,7 +1333,7 @@ class EnFunc
      * @param $str_global_var
      * @param $options
      */
-    function get_str_list(&$str_var_list, &$str_var_str, $token_str, $str_global_var, &$options) {
+    public function get_str_list(&$str_var_list, &$str_var_str, $token_str, $str_global_var, &$options) {
         if (!isset($str_var_list[$token_str])) {
             // add list
             $str_index                = array_push($str_var_str, $token_str) - 1;
@@ -1350,7 +1351,7 @@ class EnFunc
      *
      * @return float
      */
-    function microtime_float() {
+    public function microtime_float() {
         list($usec, $sec) = explode(" ", microtime());
         return ((float)$usec + (float)$sec);
     }
@@ -1364,7 +1365,7 @@ class EnFunc
      *
      * @return array
      */
-    function array_insert(&$list, $position, $array) {
+    public function array_insert(&$list, $position, $array) {
         log::info('insertStart');
         array_splice($list, $position + 1, 0, $array);
         log::info('insertOver');
@@ -1375,7 +1376,7 @@ class EnFunc
      *
      * @param $content
      */
-    function check_bom(&$content) {
+    public function check_bom(&$content) {
         $charset[1] = substr($content, 0, 1);
         $charset[2] = substr($content, 1, 1);
         $charset[3] = substr($content, 2, 1);
@@ -1391,7 +1392,7 @@ class EnFunc
      *
      * @return int
      */
-    function find_ob_function($options, $func) {
+    public function find_ob_function($options, $func) {
         $is_ob = $options['ob_call'];
         if (is_array($options['ob_call']) && in_array($func, $options['ob_call'])) {
             $is_ob = 1;
@@ -1408,7 +1409,7 @@ class EnFunc
      *
      * @return int
      */
-    function find_last_token(&$list, $index, $keywords) {
+    public function find_last_token(&$list, $index, $keywords) {
         while (--$index && $index > -1) {
             $keyword = strtolower(trim($list[$index]['content']));
             if (!$keyword) {
@@ -1431,7 +1432,7 @@ class EnFunc
      *
      * @return int
      */
-    function find_next_token(&$list, $index, $keywords) {
+    public function find_next_token(&$list, $index, $keywords) {
         $len = count($list);
         while (++$index && $index < $len) {
             $str     = isset($list[$index]['content']) ? $list[$index]['content'] : (isset($list[$index][1]) ? $list[$index][1] : $list[$index]);
@@ -1447,7 +1448,7 @@ class EnFunc
         }
     }
 
-    function find_next_is_not_statment(&$list, $index, $keywords) {
+    public function find_next_is_not_statment(&$list, $index, $keywords) {
         $len    = count($list);
         $is_var = 0;
         while (++$index && $index < $len) {
@@ -1474,7 +1475,7 @@ class EnFunc
      *
      * @return int
      */
-    function find_left_quote(&$list, $index, $left = 0) {
+    public function find_left_quote(&$list, $index, $left = 0) {
         $right_quote = $left ? 0 : 1;
         $left_quote  = $left;
         $quit        = 0;
@@ -1526,7 +1527,7 @@ class EnFunc
      *
      * @return string
      */
-    function get_func_param($is_ob, $encode, &$str_index, &$str_var_list, &$str_var_str, &$str_global_var, $func) {
+    public function get_func_param($is_ob, $encode, &$str_index, &$str_var_list, &$str_var_str, &$str_global_var, $func) {
         //return $func;
         if (!$is_ob) {
             return $func;
@@ -1552,7 +1553,7 @@ class EnFunc
      *
      * @return mixed|string
      */
-    function generate_name($encode = 1, $len = 4, $add_dollar = 1, $check_exists = 1, $pre = '') {
+    public function generate_name($encode = 1, $len = 4, $add_dollar = 1, $check_exists = 1, $pre = '') {
         global $gen_count;
         static $exists_name = array();
         static $exists_index = 0;
@@ -1595,7 +1596,7 @@ class EnFunc
      *
      * @return mixed
      */
-    function strip_str($str) {
+    public function strip_str($str) {
         $replaces = array(
             '\\' => '\\\\',
             '\'' => '\\\'',
@@ -1613,7 +1614,7 @@ class EnFunc
      *
      * @return string
      */
-    function rand_quote($str) {
+    public function rand_quote($str) {
         static $index = 0;
         return $index++ % 2 == 1 ? '{' . $str . '}' : '[' . $str . ']';
     }
@@ -1628,11 +1629,11 @@ class EnFunc
      *
      * @return string
      */
-    function output_gz($str, $gz_func, $sub_func, $encode_number, $is_gz = 0) {
+    public function output_gz($str, $gz_func, $sub_func, $encode_number, $is_gz = 0) {
         if (!$is_gz) {
             return '\'' . strip_str($str) . '\'';
         } else {
-            return $gz_func . '(' . $sub_func . '(\'' . strip_str(gzencode($str)) . '\',' . num_hex($encode_number, 10) . ', -8))';
+            return $gz_func . '(' . $sub_func . '(\'' . $this->strip_str(gzencode($str)) . '\',' . $this->num_hex($encode_number, 10) . ', -8))';
         }
     }
 
@@ -1644,7 +1645,7 @@ class EnFunc
      *
      * @return string
      */
-    function num_hex($encode, $num) {
+    public function num_hex($encode, $num) {
         if ($encode == 1) {
             if (strpos($num, '0') === 0) {
                 return $num;
@@ -1667,7 +1668,7 @@ class EnFunc
      *
      * @return mixed
      */
-    function get_defined($name) {
+    public function get_defined($name) {
         static $define_list = array();
         if (!isset($define_list[$name])) {
             $define_list[$name] = defined($name);
@@ -1680,7 +1681,7 @@ class EnFunc
      *
      * @return string
      */
-    function usedtime() {
+    public function usedtime() {
         return number_format(microtime(1) - $_SERVER['starttime'], 6) * 1000;
     }
 
@@ -1691,7 +1692,7 @@ class EnFunc
      *
      * @return string|void
      */
-    function parse_string_var($s) {
+    public function parse_string_var($s) {
         $quote        = substr($s, 0, 1);
         $val_no_quote = substr($s, 1, -1);
         if ($quote == '"') {
@@ -1709,7 +1710,7 @@ class EnFunc
      * @param        $data
      * @param string $newline
      */
-    function hex_dump($data, $newline = "\n") {
+    public function hex_dump($data, $newline = "\n") {
         static $from = '';
         static $to = '';
 
