@@ -8,8 +8,8 @@ namespace tinymeng\enphp;
 use tinymeng\enphp\Connector\GatewayInterface;
 use tinymeng\tools\Strings;
 /**
- * @method static \tinymeng\enphp\Gateways\Decode Decode(array $config) 代码解密
- * @method static \tinymeng\enphp\Gateways\Encode Encode(array $config) 代码加密
+ * @method static \tinymeng\enphp\Gateways\Decode decode(array $config=[]) 代码解密
+ * @method static \tinymeng\enphp\Gateways\Encode encode(array $config=[]) 代码加密
  */
 abstract class Client
 {
@@ -23,18 +23,11 @@ abstract class Client
      * @return mixed
      * @throws \Exception
      */
-    protected static function init($gateway, $config)
+    protected static function init($gateway, $config=[])
     {
-        if(empty($config)){
-            throw new \Exception("EnPHP [$gateway] config配置不能为空");
-        }
-        $baseConfig = [
-            'app_id'    => '',
-            'app_secret'=> '',
-            'callback'  => '',
-            'scope'     => '',
-            'type'      => '',
-        ];
+        define('DOCUMENT_ROOT',dirname(dirname(dirname(dirname(__DIR__)))).DIRECTORY_SEPARATOR);
+        $config_file = __DIR__ . "/../config/config.php";
+        $baseConfig = include($config_file);
         $gateway = Strings::uFirst($gateway);
         $class = __NAMESPACE__ . '\\Gateways\\' . $gateway;
         if (class_exists($class)) {
