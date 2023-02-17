@@ -15,10 +15,7 @@ exec
 
 ## 项目地址
 
-GITHUB：https://github.com/djunny/enphp
-
-GITEE：https://gitee.com/mz/enphp_opensource
-
+GITHUB：https://github.com/majiameng/enphp
 
 ## 背景
 
