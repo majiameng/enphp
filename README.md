@@ -1,6 +1,6 @@
 # EnPHP
 
-![LOGO](https://github.com/tinymeng/enphp/raw/master/example/logo.png)
+![LOGO](https://github.com/majiameng/enphp/blob/master/example/logo.png)
 
 请开启以下函数
 ```
@@ -31,7 +31,7 @@ GITEE：https://gitee.com/mz/enphp_opensource
 
 ## 加密效果
 
-![LOGO](https://github.com/tinymeng/enphp/raw/master/example/encode.png)
+![LOGO](https://github.com/majiameng/enphp/raw/master/example/encode.png)
 
 
 
