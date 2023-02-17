@@ -1,10 +1,19 @@
 <?php
-$_SERVER['starttime'] = microtime(1);
-$starttime            = explode(' ', $_SERVER['starttime']);
-$_SERVER['time']      = $starttime[1];
-
 class EnFunc{
+    /**
+     * @var float|string
+     */
+    private $startTime;
+    /**
+     * @var int
+     */
+    private $time;
 
+    public function __construct()
+    {
+        $this->startTime = microtime(1);
+        $this->time = time();
+    }
 
     /**
      * enphp content
@@ -13,7 +22,7 @@ class EnFunc{
      *
      * @return string
      */
-    function enphp($content, $options = array()) {
+    public function enphp($content, $options = array()) {
         $deep            = max(1, isset($options['deep']) ? (int)$options['deep'] : 1);
         $deep            = min($deep, 10);
         $options['deep'] = max(1, min($deep, 1));
@@ -32,7 +41,7 @@ class EnFunc{
      *
      * @return string
      */
-    function enphp_file($file, $target_file, $options = array()) {
+    public function enphp_file($file, $target_file, $options = array()) {
         $content = file_get_contents($file);
         check_bom($content);
         $content = enphp($content, $options);
@@ -50,7 +59,7 @@ class EnFunc{
      *
      * @return string
      */
-    function strip_whitespace($content, $options = array()) {
+    public function strip_whitespace($content, $options = array()) {
 
         format_code($content);
         $list                 = token_get_all($content);
@@ -236,14 +245,14 @@ class EnFunc{
                                 //$str_var_list[$token_str] = $val[1];
                                 break;
                             }*/
-                            // 非 function 而且是静态变量
+                            // 非 public function 而且是静态变量
                             if (!$function_stack[$is_function] && $is_static_var) {
                                 break;
                             }
 
                             // use global for this
                             if ($is_function_use) {
-                                // find in function params
+                                // find in public function params
                                 $_is_use_find = 0;
                                 foreach ($function_var_list as $_func_var_index => $_func_var_list) {
                                     if (isset($_func_var_list[$token_str])) {
@@ -294,7 +303,7 @@ class EnFunc{
                                 }
                             } elseif (($is_get_func_var || $is_function) && isset($_function_var_list[$token_str])) {
                                 $val[1] = $_function_var_list[$token_str];
-                                // in use function variables
+                                // in use public function variables
                             } elseif (($is_get_func_var || $is_function) && isset($_use_var_list[$token_str])) {
                                 $val[1] = $_use_var_list[$token_str];
                                 // in use global variables
@@ -751,7 +760,7 @@ class EnFunc{
                             $is_string_var = false;
                         } else {
                             if ($is_function && --$function_stack[$is_function] === 0) {
-                                // set static function variable empty
+                                // set static public function variable empty
                                 $static_fun_list[$is_function] = array();
                                 // find all of variables contains global;
                                 $index_key = $key;
@@ -871,7 +880,7 @@ class EnFunc{
                             }
                             break;
                         }
-                        // function () use()
+                        // public function () use()
                         $is_function_use && $is_function_use = 0;
                         if (!$function_var_close && !find_left_quote($list, $key)) {
                             $options['ob_function'] && $function_alias[] = ')';
@@ -1057,7 +1066,7 @@ class EnFunc{
      *
      * @return string
      */
-    function enphp_cut_str($html, $start = '', $end = '') {
+    public function enphp_cut_str($html, $start = '', $end = '') {
         if ($start) {
             $html = stristr($html, $start, false);
             $html = substr($html, strlen($start));
@@ -1083,7 +1092,7 @@ class EnFunc{
      *
      * @return string
      */
-    function enphp_mask_match($html, $pattern, $returnfull = false) {
+    public function enphp_mask_match($html, $pattern, $returnfull = false) {
         $part = explode('(*)', $pattern);
         if (count($part) == 1) {
             return '';
@@ -1116,7 +1125,7 @@ class EnFunc{
         }
     }
 
-    function format_code(&$source) {
+    public function format_code(&$source) {
         $patterns = array(
             '#<hi' . 'de>(*)#</hi' . 'de>'       => '',
             '/*<hi' . 'de>*/(*)/*</hi' . 'de>*/' => '',
@@ -1154,7 +1163,7 @@ class EnFunc{
     }
 
 
-    function encode_num($s, $rand = 0) {
+    public function encode_num($s, $rand = 0) {
         $n1 = rand(1, 100);
         $n2 = rand(2, 200);
         $n3 = rand(300, 500);
@@ -1181,7 +1190,7 @@ class EnFunc{
      *
      * @param $s
      */
-    function encode_str($s, $rand = 0) {
+    public function encode_str($s, $rand = 0) {
         switch (rand(1, 4 + $rand)) {
             case 1:
                 $s = base64_encode($s);
@@ -1212,7 +1221,7 @@ class EnFunc{
      * @param $str_global_var
      * @param $options
      */
-    function get_str_list(&$str_var_list, &$str_var_str, $token_str, $str_global_var, &$options) {
+    public function get_str_list(&$str_var_list, &$str_var_str, $token_str, $str_global_var, &$options) {
         if (!isset($str_var_list[$token_str])) {
             // add list
             $str_index                = array_push($str_var_str, $token_str) - 1;
@@ -1230,7 +1239,7 @@ class EnFunc{
      *
      * @return float
      */
-    function microtime_float() {
+    public function microtime_float() {
         list($usec, $sec) = explode(" ", microtime());
         return ((float)$usec + (float)$sec);
     }
@@ -1244,7 +1253,7 @@ class EnFunc{
      *
      * @return array
      */
-    function array_insert(&$list, $position, $array) {
+    public function array_insert(&$list, $position, $array) {
         log::info('insertStart');
         array_splice($list, $position + 1, 0, $array);
         log::info('insertOver');
@@ -1255,7 +1264,7 @@ class EnFunc{
      *
      * @param $content
      */
-    function check_bom(&$content) {
+    public function check_bom(&$content) {
         $charset[1] = substr($content, 0, 1);
         $charset[2] = substr($content, 1, 1);
         $charset[3] = substr($content, 2, 1);
@@ -1271,7 +1280,7 @@ class EnFunc{
      *
      * @return int
      */
-    function find_ob_function($options, $func) {
+    public function find_ob_function($options, $func) {
         $is_ob = $options['ob_call'];
         if (is_array($options['ob_call']) && in_array($func, $options['ob_call'])) {
             $is_ob = 1;
@@ -1288,7 +1297,7 @@ class EnFunc{
      *
      * @return int
      */
-    function find_last_token(&$list, $index, $keywords) {
+    public function find_last_token(&$list, $index, $keywords) {
         while (--$index && $index > -1) {
             $keyword = strtolower(trim($list[$index]['content']));
             if (!$keyword) {
@@ -1311,7 +1320,7 @@ class EnFunc{
      *
      * @return int
      */
-    function find_next_token(&$list, $index, $keywords) {
+    public function find_next_token(&$list, $index, $keywords) {
         $len = count($list);
         while (++$index && $index < $len) {
             $str     = isset($list[$index]['content']) ? $list[$index]['content'] : (isset($list[$index][1]) ? $list[$index][1] : $list[$index]);
@@ -1327,7 +1336,7 @@ class EnFunc{
         }
     }
 
-    function find_next_is_not_statment(&$list, $index, $keywords) {
+    public function find_next_is_not_statment(&$list, $index, $keywords) {
         $len    = count($list);
         $is_var = 0;
         while (++$index && $index < $len) {
@@ -1354,7 +1363,7 @@ class EnFunc{
      *
      * @return int
      */
-    function find_left_quote(&$list, $index, $left = 0) {
+    public function find_left_quote(&$list, $index, $left = 0) {
         $right_quote = $left ? 0 : 1;
         $left_quote  = $left;
         $quit        = 0;
@@ -1406,7 +1415,7 @@ class EnFunc{
      *
      * @return string
      */
-    function get_func_param($is_ob, $encode, &$str_index, &$str_var_list, &$str_var_str, &$str_global_var, $func) {
+    public function get_func_param($is_ob, $encode, &$str_index, &$str_var_list, &$str_var_str, &$str_global_var, $func) {
         //return $func;
         if (!$is_ob) {
             return $func;
@@ -1432,7 +1441,7 @@ class EnFunc{
      *
      * @return mixed|string
      */
-    function generate_name($encode = 1, $len = 4, $add_dollar = 1, $check_exists = 1, $pre = '') {
+    public function generate_name($encode = 1, $len = 4, $add_dollar = 1, $check_exists = 1, $pre = '') {
         global $gen_count;
         static $exists_name = array();
         static $exists_index = 0;
@@ -1475,7 +1484,7 @@ class EnFunc{
      *
      * @return mixed
      */
-    function strip_str($str) {
+    public function strip_str($str) {
         $replaces = array(
             '\\' => '\\\\',
             '\'' => '\\\'',
@@ -1493,7 +1502,7 @@ class EnFunc{
      *
      * @return string
      */
-    function rand_quote($str) {
+    public function rand_quote($str) {
         static $index = 0;
         return $index++ % 2 == 1 ? '{' . $str . '}' : '[' . $str . ']';
     }
@@ -1508,7 +1517,7 @@ class EnFunc{
      *
      * @return string
      */
-    function output_gz($str, $gz_func, $sub_func, $encode_number, $is_gz = 0) {
+    public function output_gz($str, $gz_func, $sub_func, $encode_number, $is_gz = 0) {
         if (!$is_gz) {
             return '\'' . strip_str($str) . '\'';
         } else {
@@ -1524,7 +1533,7 @@ class EnFunc{
      *
      * @return string
      */
-    function num_hex($encode, $num) {
+    public function num_hex($encode, $num) {
         if ($encode == 1) {
             if (strpos($num, '0') === 0) {
                 return $num;
@@ -1547,7 +1556,7 @@ class EnFunc{
      *
      * @return mixed
      */
-    function get_defined($name) {
+    public function get_defined($name) {
         static $define_list = array();
         if (!isset($define_list[$name])) {
             $define_list[$name] = defined($name);
@@ -1560,8 +1569,8 @@ class EnFunc{
      *
      * @return string
      */
-    function usedtime() {
-        return number_format(microtime(1) - $_SERVER['starttime'], 6) * 1000;
+    public function usedtime() {
+        return number_format(microtime(1) - $this->startTime, 6) * 1000;
     }
 
     /**
@@ -1571,7 +1580,7 @@ class EnFunc{
      *
      * @return string|void
      */
-    function parse_string_var($s) {
+    public function parse_string_var($s) {
         $quote        = substr($s, 0, 1);
         $val_no_quote = substr($s, 1, -1);
         if ($quote == '"') {
@@ -1589,7 +1598,7 @@ class EnFunc{
      * @param        $data
      * @param string $newline
      */
-    function hex_dump($data, $newline = "\n") {
+    public function hex_dump($data, $newline = "\n") {
         static $from = '';
         static $to = '';
 
