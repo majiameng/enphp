@@ -239,7 +239,7 @@ class EnFunc
             // 移除注释 1=移除 0=保留
             'remove_comment'     => 1,
             // 文件头部增加的注释
-            'comment'            => '购买源码联系QQ:550060345',
+            'comment'            => '代码加密:tinymeng/enphp',
             // debug
             'debug'              => 0,
             // 重复加密次数，加密次数越多反编译可能性越小，但性能会成倍降低
