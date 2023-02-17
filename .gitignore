@@ -1,0 +1,11 @@
+# phpstorm project files
+.idea/*
+composer.lock
+composer.phar
+vendor/
+build/
+phpunit.xml
+*.DS_store
+.php_cs.cache
+docs/api
+cache/

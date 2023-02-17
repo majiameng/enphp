@@ -1,0 +1,25 @@
+{
+    "name": "tinymeng/enphp",
+    "description": "a Open Source PHP Code Confusion + Encryption Project",
+    "keywords": [
+        "tinymeng", "enphp","php-enphp","php"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "JiaMeng Ma",
+            "email": "666@majiameng.com",
+            "homepage": "http://majiameng.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0.0",
+        "tinymeng/tools": "^1.2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "tinymeng\\enphp\\": "src"
+        },
+        "files": []
+    }
+}
