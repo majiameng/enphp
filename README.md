@@ -2,6 +2,21 @@
 
 ![LOGO](https://github.com/majiameng/enphp/blob/master/example/logo.png)
 
+
+# PHP Enphp Class
+
+## 您可以在网站上找到tinymeng/enphp。查看“入门”页面以获取快速概述。
+
+* [Wiki Home](https://github.com/majiameng/enphp/wiki)
+
+# Installation
+
+```
+composer require tinymeng/spreadsheet  -vvv
+```
+
+
+
 请开启以下函数
 ```
 exec
