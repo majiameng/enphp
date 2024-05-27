@@ -12,7 +12,7 @@
 # Installation
 
 ```
-composer require tinymeng/spreadsheet  -vvv
+composer require tinymeng/enphp  -vvv
 ```
 
 
